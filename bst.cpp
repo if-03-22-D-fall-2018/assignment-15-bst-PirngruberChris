@@ -26,8 +26,11 @@ Bst new_bst(){
 
 void delete_bst(Bst bst){
   if (bst != 0) {
-      sfree(bst);
+    delete_bst(bst->left);
+    delete_bst(bst->right);
+    sfree(bst);
   }
+
 }
 
 
@@ -45,14 +48,14 @@ void add(Bst* bst, int value){
   new_Node->left = 0;
   new_Node->right = 0;
 
-  if (*bst == 0) {
-    *bst = new_Node;
+  if ((*bst) == 0) {
+    (*bst) = new_Node;
   }else{
-    if (value <= *bst->value) {
-      *bst->left = new_Node;
+    if (value <= (*bst)->value) {
+      (*bst)->left = new_Node;
     }
-    if (value > *bst->value) {
-      *bst->right = new_Node;
+    if (value > (*bst)->value) {
+      (*bst)->right = new_Node;
     }
   }
 }
