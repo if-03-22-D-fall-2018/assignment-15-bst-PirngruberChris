@@ -35,52 +35,48 @@ void delete_bst(Bst bst){
 
 
 int get_depth(Bst bst){
-  if (bst != 0) {
-    return 1;
+  if (bst == 0) {
+    return 0;
   }
-  return 0;
+  int left_subtree = get_depth(bst->left);
+  int right_subtree = get_depth(bst->right);
+
+  if (left_subtree > right_subtree) {
+    return left_subtree + 1;
+  }
+  return right_subtree + 1;
 }
 
-void Insert(int value, Node* start_node);
+Node* createNode(int value);
 
 void add(Bst* bst, int value){
-  Node* new_Node = (struct Node*)malloc(sizeof(struct Node));
+  if (*bst == 0) {
+    *bst = createNode(value);
+  }
+  else{
+    if (value <= (*bst)->value) {
+      if ((*bst)->left == 0) {
+        (*bst)->left = createNode(value);
+      }else{
+        add(&((*bst)->left), value);
+      }
+    }
+    else{
+      if ((*bst)->right == 0) {
+        (*bst)->right = createNode(value);
+      }else{
+        add(&((*bst)->right), value);
+      }
+    }
+  }
+}
+
+Node* createNode(int value){
+  Node* new_Node = (struct Node*) malloc(sizeof(struct Node));
   new_Node->value = value;
   new_Node->left = 0;
   new_Node->right = 0;
-
-  if ((*bst) == 0) {
-    (*bst) = new_Node;
-  }else{
-    if (value <= (*bst)->value) {
-      (*bst)->left = new_Node;
-    }
-    if (value > (*bst)->value) {
-      (*bst)->right = new_Node;
-    }
-  }
-}
-
-void Insert(int value, Node* start_node){
-  if(value <= start_node->value){
-    if(start_node->left == 0){
-      start_node->left = (struct Node*) malloc(sizeof(struct Node));
-      start_node->value = value;
-      start_node->left = 0;
-      start_node->right = 0;
-    } else {
-      Insert(value, start_node->left);
-    }
-  } else {
-    if(start_node->right == 0){
-      start_node->right = (struct Node*) malloc(sizeof(struct Node));
-      start_node->value = value;
-      start_node->left = 0;
-      start_node->right = 0;
-    } else {
-      Insert(value, start_node->right);
-    }
-  }
+  return new_Node;
 }
 
 int root_value(Bst bst){
@@ -92,40 +88,98 @@ int root_value(Bst bst){
 
 
 Bst left_subtree(Bst root){
+  if (root == 0) {
+    return 0;
+  }
   return root->left;
 }
 
 
 Bst right_subtree(Bst root){
+  if (root == 0) {
+    return 0;
+  }
   return root->right;
 }
 
 
 int traverse_pre_order(Bst bst, int *elements, int start){
-  return 0;
+  if(bst == 0){
+    return start;
+  }
+  elements[start] = bst->value;
+  start++;
+  start = traverse_pre_order(bst->left, elements, start);
+  start = traverse_pre_order(bst->right, elements, start);
+  return start;
 }
 
 
 int traverse_in_order(Bst bst, int *elements, int start){
-  return 0;
+  if(bst == 0){
+    return start;
+  }
+  start = traverse_in_order(bst->left, elements, start);
+  elements[start] = bst->value;
+  start++;
+  start = traverse_in_order(bst->right, elements, start);
+  return start;
 }
 
 
 int traverse_post_order(Bst bst, int *elements, int start){
-  return 0;
+  if(bst == 0){
+  return start;
+}
+start = traverse_post_order(bst->left, elements, start);
+start = traverse_post_order(bst->right, elements, start);
+elements[start] = bst->value;
+start++;
+return start;
 }
 
 
 bool are_equal(Bst bst1, Bst bst2){
+  if(bst1 == 0 && bst2 == 0){
+    return true;
+  }
+  if(get_depth(bst1) == get_depth(bst2)){
+    int *elements = new int[get_depth(bst1)];
+    traverse_in_order(bst1, elements, 0);
+    int *elements1 = new int[get_depth(bst2)];
+    traverse_in_order(bst2, elements1, 0);
+    for (int i = 0; i < get_depth(bst1)+1; i++) {
+      if(elements[i] != elements1[i]){
+        return false;
+      }
+    }
+    if(bst1->value == bst2->value){
+      return true;
+    }
+  }
   return false;
 }
 
 
 void most_left_longest_branch(Bst bst, Bst* branch){
-
+  if(bst == 0){
+    return;
+  }
+  if(get_depth(bst->right) > get_depth(bst->left)){
+    add(branch, bst->value);
+    most_left_longest_branch(&(*bst->right), branch);
+  } else if (get_depth(bst->right) <= get_depth(bst->left)){
+    add(branch, bst->value);
+    most_left_longest_branch(&(*bst->left), branch);
+  }
 }
 
 
 int get_number_of_subtrees(Bst bst){
-  return 0;
+  if(bst == 0){
+    return -1;
+  }
+  int *elements = new int[get_depth(bst)];
+  int solution = traverse_in_order(bst, elements, 0);
+  return solution-1;
 }
